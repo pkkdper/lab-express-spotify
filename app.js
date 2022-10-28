@@ -1,25 +1,45 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const express = require('express');
-const hbs = require('hbs');
-
-const SpotifyWebApi = require('spotify-web-api-node');
-const spotifyApi = new SpotifyWebApi({
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET
-  });
-  spotifyApi
-  .clientCredentialsGrant()
-  .then(data => spotifyApi.setAccessToken(data.body['access_token']))
-  .catch(error => console.log('Something went wrong when retrieving an access token', error));
+const express = require("express");
 const app = express();
+const expressLayouts = require("express-ejs-layouts");
+app.use(expressLayouts);
+app.set("view engine", "ejs");
+app.set("views", __dirname + "/views");
+app.use(express.static(__dirname + "/public"));
+const SpotifyWebApi = require("spotify-web-api-node");
+const spotifyApi = new SpotifyWebApi({
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+});
+spotifyApi
+  .clientCredentialsGrant()
+  .then((data) => spotifyApi.setAccessToken(data.body["access_token"]))
+  .catch((error) =>
+    console.log("Something went wrong when retrieving an access token", error)
+  );
+spotifyApi.setAccessToken("access_token");
 
-app.set('view engine', 'hbs');
-app.set('views', __dirname + '/views');
-app.use(express.static(__dirname + '/public'));
+app.get("/", (req, res) => {
+  res.render("home");
+});
+app.get("/artist-search", (req, res) => {
+    console.log("it works");
 
-// setting the spotify-api goes here:
+    spotifyApi
+      .searchArtists(req.query.name)
+      .then((data) => {
+        console.log(
+          "The received data from the API: ",
+          data.body.artists.items
+        );
+        res.render("artist-search-results", { data1: data.body.artists.items });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 
-// Our routes go here:
-
-app.listen(3000, () => console.log('My Spotify project running on port 3000 🎧 🥁 🎸 🔊'));
+app.listen(3000, () =>
+  console.log("My Spotify project running on port 3000 🎧 🥁 🎸 🔊")
+);
