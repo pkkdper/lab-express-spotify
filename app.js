@@ -23,22 +23,31 @@ spotifyApi.setAccessToken("access_token");
 app.get("/", (req, res) => {
   res.render("home");
 });
-app.get("/artist-search", (req, res) => {
-    console.log("it works");
 
-    spotifyApi
-      .searchArtists(req.query.name)
-      .then((data) => {
-        console.log(
-          "The received data from the API: ",
-          data.body.artists.items
-        );
-        res.render("artist-search-results", { data1: data.body.artists.items });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
+app.get("/artist-search", (req, res) => {
+  console.log("it works");
+  spotifyApi
+    .searchArtists(req.query.name)
+    .then((data) => {
+      console.log("The received data from the API: ", data.body.artists.items);
+      res.render("artist-search-results", { data1: data.body.artists.items });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+app.get("/albums/:artistId", (req, res, next) => {
+  spotifyApi.getArtistAlbums(req.query.id).then(
+    (data) => {
+      console.log("Artist albums", data.body.artists.album);
+      res.render('albums', {data2: data.body.artists.album})
+    },
+    (err) => {
+      console.log(err);
+    }
+  );
+});
 
 app.listen(3000, () =>
   console.log("My Spotify project running on port 3000 🎧 🥁 🎸 🔊")

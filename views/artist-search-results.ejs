@@ -1,5 +1,8 @@
 <% for(let i = 0 ; i<data1.length ; i++) { %>
-   
-    <p><%- data1[i].name %></p>
+   <form action="/artist-search", method="GET">
+        <button type="submit" value="submit">Search for album</button>
+    </form>
+    <p><%- data1[i].album %></p>
     <%} %>
+
     
